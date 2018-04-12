@@ -39,9 +39,33 @@ ui <- fluidPage(theme = "main.css",
     tabPanel("Correlation with Chronological Age",
              sidebarLayout(
                sidebarPanel(
-                 helpText("Upload a .csv file of SampleAnnotation that contains the chronological ages for which the DNAm Age was ")
+                 helpText("Upload a .csv file of SampleAnnotation that contains the chronological ages for which the DNAm Age was "),
+                 fileInput(
+                   inputId = "sampleannoFile",
+                   label = "Upload sample annotation .csv file",
+                   accept = c('text/csv',
+                              'text/comma-separated-values,text/plain',
+                              '.csv'),
+                   multiple = FALSE),
+                 hr(),
+                 hr(),
+                 helpText("Upload the output file generated using DNAmAge calculation."),
+                 fileInput(
+                   inputId = "dnamageOutput",
+                   label = "Upload DNAmAge output .csv file",
+                   accept = c('text/csv',
+                              'text/comma-separated-values,text/plain',
+                              '.csv'),
+                   multiple = FALSE),
+                 hr(),
+                 hr(),
+                 p("Based on",
+                   a(href="https://doi.org/10.1186/gb-2013-14-10-r115", "\"DNA methylation age of human tissues and cell types\""),
+                   "by",
+                   a(href="https://www.biostat.ucla.edu/people/horvath", "Steve Horvath.")
+                 )
                ),
-               mainPanel()
+               mainPanel(plotOutput("plot"))
              ))
   )
 )
@@ -50,12 +74,12 @@ server <- function(input,output){
   source("horvath.R")
   
   output$table <- renderDataTable({
+    req(input$betaFile)
     withProgress(message = 'Calculation in progress', detail = 'This may take a while...',value = 0, {
       for(i in 1:15){
         incProgress(1/20)
         Sys.sleep(0.25)
       }
-    req(input$betaFile)
     dat0 = read.csv.sql(input$betaFile$datapath,header = TRUE,sep = ",")
     datMiniAnnotation=read.csv("datMiniAnnotation.csv")
     match1=match(datMiniAnnotation[,1], dat0[,1] )
@@ -73,5 +97,17 @@ server <- function(input,output){
     final <- calculateAge(datout)
     })
   })
+  
+  output$plot <- renderPlot({
+    req(input$sampleannoFile)
+    req(input$dnamageOutput)
+    datSample = read.csv(input$sampleannoFile$datapath,header = TRUE,sep = ",")
+    datDNAmAge = read.csv(input$dnamageOutput$datapath,header = TRUE,sep = ",")
+    DNAmAge = datDNAmAge$DNAmAge
+    medianAbsDev=function(x,y) median(abs(x-y),na.rm=TRUE)
+    medianAbsDev1=signif(medianAbsDev(DNAmAge, datSample$Age),2)
+    par(mfrow=c(1,1))
+    verboseScatterplot(DNAmAge, datSample$Age,xlab="DNAm Age", ylab="Chronological Age",main=paste("All, err=",medianAbsDev1) );abline(0,1)
+  },height = 700, width = 700)
 }
 shinyApp(ui = ui, server = server)
