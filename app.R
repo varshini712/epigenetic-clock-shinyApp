@@ -5,8 +5,13 @@ library(readr)
 
 ui <- fluidPage(theme = "main.css",
   navbarPage("EpGClock",
-    tabPanel("Home",fluidRow(column(5,HTML('<h1>Epigenetic Clock</h1>')),
-                          column(9,HTML('<img src = "main.jpeg" class=responsive></img>')))
+    tabPanel("Home",fluidRow(column(6,style="background-image:url(\"main.jpeg\");",div(style="height:870px;")),
+                             column(6,h1("Epigenetic Clock"),br(),br(),
+      p("Epigenetic clock, also called as DNAmAge is used to predict the DNA methylation age of tissues and cell types using data generated from Illumina Infinium platform.
+        This application is developed based on the code and instructions provided by Steve Horvath who developed the methylation age calculator."),
+      p(style="font-weight:bold","Citation:",a("DNA methylation age of human tissues and cell types.",href="https://www.ncbi.nlm.nih.gov/pubmed/24138928")),
+      style="background-color:white;", div(style = "height:870px;"))
+                             )
     ),
     tabPanel("Calculate DNAm Age",
             sidebarLayout(
