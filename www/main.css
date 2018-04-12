@@ -11,10 +11,10 @@
 }
 
 .responsive {
-  width: 60%;
-  max-width: 80%;
-  height: 80%;
-  max-height: 80%;
+  width: 100%;
+  max-width: 100%;
+  max-height: 800px;
+  height: auto;
   position: relative;
   margin-left: auto;
   margin-right: auto;
