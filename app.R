@@ -81,7 +81,7 @@ server <- function(input,output){
         Sys.sleep(0.25)
       }
     dat0 = read.csv.sql(input$betaFile$datapath,header = TRUE,sep = ",")
-    datMiniAnnotation=read.csv("datMiniAnnotation.csv")
+    datMiniAnnotation=read.csv("datMiniAnnotation.csv",header = TRUE,sep = ",")
     match1=match(datMiniAnnotation[,1], dat0[,1] )
     dat0Reduced=dat0[match1,]
     dat0Reduced[,1]=as.character(dat0Reduced[,1])
